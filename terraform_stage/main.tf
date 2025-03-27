@@ -36,7 +36,7 @@ module "alb" {
     vpc_id = module.vpc.vpc_id
     sg_allow_comm_list = [var.subnet_public_az1, var.subnet_public_az2]
     subnet_ids = module.vpc.public_app_subnet_ids
-    certificate_arn = "arn:aws:acm:ap-northeast-2:405894838468:certificate/8eba9c5e-5a11-4944-9afc-cd630c92bf55"
+    certificate_arn = var.acm_certificate_arn_ap
     instance_ids = module.instance.instance_ids
 }
 
@@ -62,7 +62,6 @@ module "instance" {
 #!/bin/bash 
 sudo yum update -y 
 sudo yum install -y nginx
-echo "<h1>shndahye test page</h1>" | sudo tee /usr/share/nginx/html/index.html
 sudo systemctl start nginx
 sudo systemctl enable nginx
 EOF
@@ -73,11 +72,27 @@ EOF
 #   depends_on = [module.vpc.sg-ec2-comm, module.iam-service-role.ec2-iam-role-profile]
 }
 
-module "aws_route53" {
-  source = "../modules/route53"
+# module "aws_route53" {
+#   source = "../modules/route53"
 
-  alb_dns_name = module.alb.alb_dns_name
+#   alb_dns_name = module.alb.alb_dns_name
+#   cloudfront_domain_name = module.frontend_bucket.cloudfront_domain_name
+#   cloudfront_zone_id     = module.frontend_bucket.cloudfront_zone_id
+# }
+
+module "frontend_bucket" {
+  source = "../modules/s3"
+
+  frontend_bucket_name = "www.shndh.kro.kr"
+  acm_certificate_arn = var.acm_certificate_arn_us
 }
+
+# module "cloudfront" {
+#   source = "../modules/cloudfront"
+
+  
+# }
+
 
 resource "aws_security_group" "sg-ec2" {
   vpc_id = module.vpc.vpc_id

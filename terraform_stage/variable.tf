@@ -78,3 +78,14 @@ variable "associate_public_ip_address" {
   type = bool
   default = true
 }
+
+# acm
+variable "acm_certificate_arn_us" {
+    type = string
+    default = "arn:aws:acm:us-east-1:405894838468:certificate/66ca7e38-b04f-4307-9ec6-78856b9f9912"
+}
+
+variable "acm_certificate_arn_ap" {
+    type = string
+    default = "arn:aws:acm:ap-northeast-2:405894838468:certificate/8eba9c5e-5a11-4944-9afc-cd630c92bf55"
+}
