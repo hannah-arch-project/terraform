@@ -107,3 +107,24 @@ variable "db_pass" {
   type        = string
   #sensitive   = true
 }
+
+# code deploy
+variable "codedeploy_app_name" {
+  type        = string
+  default = "backend_app"
+}
+
+variable "codedeploy_deployment_group_name" {
+  type        = string
+  default = "backend_app_deploy_group"
+}
+
+variable "ec2_tag_key" {
+  type        = string
+  default = "Name"
+}
+
+variable "ec2_tag_value" {
+  type        = string
+  default = "backend_app_instance"
+}

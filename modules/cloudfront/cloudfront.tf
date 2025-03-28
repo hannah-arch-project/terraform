@@ -3,7 +3,7 @@ resource "aws_cloudfront_distribution" "frontend" {
   default_root_object = "index.html"
 
   origin {
-    domain_name = aws_s3_bucket.frontend_bucket.bucket_regional_domain_name
+    domain_name = var.domain_name
     origin_id   = "frontendS3Origin"
 
     s3_origin_config {
@@ -44,5 +44,7 @@ resource "aws_cloudfront_distribution" "frontend" {
   aliases = ["www.shndh.kro.kr"]
 }
 
-
+resource "aws_cloudfront_origin_access_identity" "oai" {
+  comment = "OAI for frontend bucket"
+}
 

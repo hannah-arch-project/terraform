@@ -31,6 +31,9 @@ resource "aws_instance" "ec2" {
   #        Name =  "aws-ec2-${var.stage}-${var.servicename}"}),
   #       var.tags)
 
+  tags = {
+    Name = "backend_app_instance"
+  }
   # lifecycle {
   #   ignore_changes = [user_data,associate_public_ip_address,instance_state]
   # }
