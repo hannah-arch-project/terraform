@@ -89,3 +89,21 @@ variable "acm_certificate_arn_ap" {
     type = string
     default = "arn:aws:acm:ap-northeast-2:405894838468:certificate/8eba9c5e-5a11-4944-9afc-cd630c92bf55"
 }
+
+#rds
+variable "db_name" {
+  description = "RDS DB name"
+  default = "wordpress"
+  type = string
+}
+variable "db_user" {
+  description = "RDS user"
+  default = "admin"
+  type = string
+}
+variable "db_pass" {
+  description = "RDS DB password"
+  default = "shndahye908"
+  type        = string
+  #sensitive   = true
+}

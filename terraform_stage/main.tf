@@ -47,7 +47,6 @@ module "instance" {
     ami                       = var.ami
     instance_type             = var.instance_type
     #ebs_size                  = var.instance_ebs_size
-    #user_data                 = var.instance_user_data
     #kms_key_id                = var.ebs_kms_key_id
     #ec2-iam-role-profile-name = module.iam-service-role.ec2-iam-role-profile.name
     ssh_allow_comm_list       = [var.subnet_app_az1, var.subnet_app_az2]
@@ -56,15 +55,11 @@ module "instance" {
 
     associate_public_ip_address = var.associate_public_ip_address
 
-  subnet_id = module.vpc.public-az1.id
-  vpc_id    = module.vpc.vpc_id
-  user_data = <<-EOF
-#!/bin/bash 
-sudo yum update -y 
-sudo yum install -y nginx
-sudo systemctl start nginx
-sudo systemctl enable nginx
-EOF
+    subnet_id = module.vpc.public-az1.id
+    vpc_id    = module.vpc.vpc_id
+
+    user_data = data.template_file.wordpress_user_data.rendered
+
 
     isPortForwarding = false   
 #   #SecurityGroup
@@ -72,13 +67,38 @@ EOF
 #   depends_on = [module.vpc.sg-ec2-comm, module.iam-service-role.ec2-iam-role-profile]
 }
 
-# module "aws_route53" {
-#   source = "../modules/route53"
+data "template_file" "wordpress_user_data" {
+  template = file("${path.module}/wordpress_userdata.sh")
+  vars = {
+    db_name = module.rds.db_name
+    db_user = module.rds.db_username
+    db_pass = module.rds.db_password
+    rds_endpoint = module.rds.rds_endpoint
+  }
+}
 
-#   alb_dns_name = module.alb.alb_dns_name
-#   cloudfront_domain_name = module.frontend_bucket.cloudfront_domain_name
-#   cloudfront_zone_id     = module.frontend_bucket.cloudfront_zone_id
-# }
+module "aws_route53" {
+  source = "../modules/route53"
+
+  alb_dns_name = module.alb.alb_dns_name
+  cloudfront_domain_name = module.frontend_bucket.cloudfront_domain_name
+  cloudfront_zone_id     = module.frontend_bucket.cloudfront_zone_id
+}
+
+module "rds" {
+  source = "../modules/rds"
+
+  name              = "wordpress"
+  vpc_id            = module.vpc.vpc_id
+  subnet_ids        = module.vpc.private_db_subnet_ids
+  ec2_sg_id         = module.instance.ec2_sg_id
+
+  instance_class     = "db.t3.micro"
+  allocated_storage  = 20
+  db_name            = var.db_name
+  db_username        = var.db_user
+  db_password        = var.db_pass
+}
 
 module "frontend_bucket" {
   source = "../modules/s3"

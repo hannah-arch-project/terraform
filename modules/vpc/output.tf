@@ -58,3 +58,8 @@ output public_app_subnet_ids {
   description = "List of public subnets for ALB/EC2"
   value       = [aws_subnet.public_a.id, aws_subnet.public_c.id]
 }
+
+output "private_db_subnet_ids" {
+  description = "private subnet for DB"
+  value = [aws_subnet.private_db_a.id, aws_subnet.private_db_c.id]
+}
